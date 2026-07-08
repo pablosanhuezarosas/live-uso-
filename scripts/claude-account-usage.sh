@@ -3,7 +3,7 @@
 # OAuth usage endpoint, using the same token Claude Code already stores in
 # the macOS Keychain. Cached with a TTL to avoid hammering the endpoint.
 CACHE="$HOME/.claude/account-usage-cache.json"
-TTL=180
+TTL=60
 NOW=$(date +%s)
 
 if [ -f "$CACHE" ]; then
