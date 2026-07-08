@@ -1,0 +1,57 @@
+{
+  "_comment": "Agregar este bloque 'hooks' a tu ~/.claude/settings.json (mergear con lo que ya tengas, no reemplazar). Requiere tus propios archivos de sonido en ~/.claude/sounds/ (no incluidos en este repo por copyright).",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          { "type": "command", "command": "echo NOP > ~/.claude/status.state &" }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          { "type": "command", "command": "echo RUN > ~/.claude/status.state &" }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          { "type": "command", "command": "echo RUN > ~/.claude/status.state &" }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo INT > ~/.claude/status.state & afplay ~/.claude/sounds/permission.mp3 &"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo RET > ~/.claude/status.state & afplay ~/.claude/sounds/success.mp3 & ( sleep 4; echo NOP > ~/.claude/status.state ) &"
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo HLT > ~/.claude/status.state & afplay ~/.claude/sounds/error.mp3 & ( sleep 4; echo NOP > ~/.claude/status.state ) &"
+          }
+        ]
+      }
+    ]
+  }
+}
