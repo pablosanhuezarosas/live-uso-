@@ -12,15 +12,21 @@ Por Pablo Sanhueza Rosas.
 | `menubar/claude-usage.15s.sh` | 15s | Cuenta regresiva hasta el reset de la ventana de 5h; costo real de la sesión actual (tokens exactos del transcript local + pricing oficial vigente) disponible en el dropdown |
 | `menubar/claude-account.60s.sh` | 60s | Uso real de cuenta: ventana de 5 horas y 7 días (via el endpoint OAuth de Anthropic), con alertas sonoras en 20/50/75/90/95% |
 
-### Menú SETTINGS (sonidos y volumen)
+### Menús SETTINGS (sonidos y volumen)
 
-`claude-status.1s.sh` agrega un submenú **▓ SETTINGS ▓** con:
+Cada plugin que reproduce sonido tiene su **propio** menú SETTINGS, con estado independiente — cambiar uno no afecta al otro.
 
-- **Sonido por evento** (permission / success / error): lista cualquier `.mp3` que pongas en `~/.claude/sounds/` y con un click lo asigna a ese evento — copia el archivo elegido sobre el nombre fijo que los hooks siempre invocan (`permission.mp3`, `success.mp3`, `error.mp3`), así que nunca hace falta tocar `settings.json` de nuevo.
-- **Volumen** (25%–200%): se guarda en `~/.claude/sound-volume.txt` y los hooks lo leen dinámicamente (`afplay -v $(cat ...)`).
-- **Abrir carpeta de sonidos**: atajo para agregar archivos nuevos.
+**`claude-status.1s.sh`** (hooks de permission/success/error):
+- **Sonido por evento**: lista cualquier `.mp3` en `~/.claude/sounds/` y lo asigna con un click — copia el archivo elegido sobre el nombre fijo que los hooks invocan (`permission.mp3`, `success.mp3`, `error.mp3`), así que nunca hace falta tocar `settings.json` de nuevo.
+- **Volumen** (10%–100%): `~/.claude/sound-volume.txt`, leído dinámicamente por los hooks.
+- Requiere `scripts/set-sound.sh` + `scripts/set-volume.sh`.
 
-Requiere `scripts/set-sound.sh` y `scripts/set-volume.sh` (incluidos en este repo).
+**`claude-account.60s.sh`** (alertas de 20/50/75/90/95%):
+- **Sonido de alerta**: mismo mecanismo, target fijo `account-alert.mp3`.
+- **Volumen de alerta** (10%–100%): `~/.claude/account-alert-volume.txt`, independiente del de arriba.
+- Requiere `scripts/set-account-sound.sh` + `scripts/set-account-volume.sh`.
+
+Ambos pares de scripts guardan qué sonido está activo en `~/.claude/sound-settings.json` (claves `permission`/`success`/`error`/`account_alert`).
 
 ## Cómo funciona (fuentes de datos)
 

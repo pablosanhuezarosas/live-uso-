@@ -67,7 +67,7 @@ FIVE_PCT=${FIVE_PCT:-0}
 SEVEN_PCT=${SEVEN_PCT:-0}
 
 ALERT_STATE="$HOME/.claude/account-alert-state.json"
-ALERT_SOUND="$HOME/.claude/sounds/error.mp3"
+ALERT_SOUND="$HOME/.claude/sounds/account-alert.mp3"
 
 check_alerts() {
   local pct=$1
@@ -82,7 +82,7 @@ check_alerts() {
   new_alerted="$alerted"
 
   local vol
-  vol=$(cat "$HOME/.claude/sound-volume.txt" 2>/dev/null || echo 1.0)
+  vol=$(cat "$HOME/.claude/account-alert-volume.txt" 2>/dev/null || echo 1.0)
 
   for threshold in 20 50 75 90 95; do
     already=$(echo "$alerted" | jq --argjson t "$threshold" 'index($t) != null')
@@ -121,4 +121,33 @@ printf "   [%s] %d%% | font=Menlo size=13 color=%s\n" "$SEVEN_BAR" "$SEVEN_PCT" 
 printf "   RESET >> %s | font=Menlo size=12 color=#39ff14\n" "$SEVEN_RESET_LOCAL"
 echo "──────────────────────────────"
 echo ":: fuente no oficial :: api.anthropic.com/oauth/usage | font=Menlo size=10 color=#2d6e1e"
+echo "---"
+echo "▓ SETTINGS ▓ | font=Menlo size=11 color=#1fae0a"
+
+SOUNDS_DIR="$HOME/.claude/sounds"
+SET_ACCOUNT_SOUND="$HOME/.claude/scripts/set-account-sound.sh"
+SOUND_STATE="$HOME/.claude/sound-settings.json"
+
+CURRENT_SOUND=$(jq -r '.account_alert // "?"' "$SOUND_STATE" 2>/dev/null)
+echo "-- Sonido de alerta (actual: $CURRENT_SOUND) | font=Menlo size=11"
+for f in "$SOUNDS_DIR"/*.mp3; do
+  [ -e "$f" ] || continue
+  NAME=$(basename "$f")
+  MARK=""
+  [ "$NAME" = "$CURRENT_SOUND" ] && MARK=" ✓"
+  echo "---- $NAME$MARK | bash=$SET_ACCOUNT_SOUND param1=\"$f\" terminal=false refresh=true"
+done
+
+SET_ACCOUNT_VOLUME="$HOME/.claude/scripts/set-account-volume.sh"
+CURRENT_VOL=$(cat "$HOME/.claude/account-alert-volume.txt" 2>/dev/null || echo "1.0")
+echo "-- Volumen de alerta (actual: ${CURRENT_VOL}) | font=Menlo size=11"
+for LEVEL in "10%:0.1" "20%:0.2" "30%:0.3" "40%:0.4" "50%:0.5" "60%:0.6" "70%:0.7" "80%:0.8" "90%:0.9" "100%:1.0"; do
+  LABEL="${LEVEL%%:*}"
+  VAL="${LEVEL##*:}"
+  MARK=""
+  [ "$VAL" = "$CURRENT_VOL" ] && MARK=" ✓"
+  echo "---- $LABEL$MARK | bash=$SET_ACCOUNT_VOLUME param1=$VAL terminal=false refresh=true"
+done
+
+echo "---"
 echo "by Pablo Sanhueza Rosas | font=Menlo size=10 color=#1fae0a"
