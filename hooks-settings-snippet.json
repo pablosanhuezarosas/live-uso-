@@ -1,5 +1,5 @@
 {
-  "_comment": "Agregar este bloque 'hooks' a tu ~/.claude/settings.json (mergear con lo que ya tengas, no reemplazar). Requiere tus propios archivos de sonido en ~/.claude/sounds/ (no incluidos en este repo por copyright).",
+  "_comment": "Agregar este bloque 'hooks' a tu ~/.claude/settings.json (mergear con lo que ya tengas, no reemplazar). Requiere tus propios archivos de sonido en ~/.claude/sounds/ (no incluidos en este repo por copyright). El volumen se lee dinamicamente de ~/.claude/sound-volume.txt (float, default 1.0) — se ajusta desde el menu SETTINGS del plugin claude-status.1s.sh sin tener que editar estos hooks de nuevo.",
   "hooks": {
     "SessionStart": [
       {
@@ -28,7 +28,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo INT > ~/.claude/status.state & afplay ~/.claude/sounds/permission.mp3 &"
+            "command": "echo INT > ~/.claude/status.state & afplay -v $(cat ~/.claude/sound-volume.txt 2>/dev/null || echo 1.0) ~/.claude/sounds/permission.mp3 &"
           }
         ]
       }
@@ -38,7 +38,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo RET > ~/.claude/status.state & afplay ~/.claude/sounds/success.mp3 & ( sleep 4; echo NOP > ~/.claude/status.state ) &"
+            "command": "echo RET > ~/.claude/status.state & afplay -v $(cat ~/.claude/sound-volume.txt 2>/dev/null || echo 1.0) ~/.claude/sounds/success.mp3 & ( sleep 4; echo NOP > ~/.claude/status.state ) &"
           }
         ]
       }
@@ -48,7 +48,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo HLT > ~/.claude/status.state & afplay ~/.claude/sounds/error.mp3 & ( sleep 4; echo NOP > ~/.claude/status.state ) &"
+            "command": "echo HLT > ~/.claude/status.state & afplay -v $(cat ~/.claude/sound-volume.txt 2>/dev/null || echo 1.0) ~/.claude/sounds/error.mp3 & ( sleep 4; echo NOP > ~/.claude/status.state ) &"
           }
         ]
       }

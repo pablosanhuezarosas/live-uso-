@@ -8,9 +8,19 @@ Por Pablo Sanhueza Rosas.
 
 | Plugin | Refresco | Qué muestra |
 |---|---|---|
-| `menubar/claude-status.1s.sh` | 1s | Estado en vivo: `NOP` (idle), `RUN` (ejecutando), `INT` (esperando permiso, parpadea), `RET` (tarea OK), `HLT` (error) |
-| `menubar/claude-usage.15s.sh` | 15s | Costo real de la sesión actual, calculado con tokens exactos del transcript local + pricing oficial vigente |
-| `menubar/claude-account.180s.sh` | 180s | Uso real de cuenta: ventana de 5 horas y 7 días (via el endpoint OAuth de Anthropic), con alertas sonoras en 20/50/75/90/95% |
+| `menubar/claude-status.1s.sh` | 1s | Estado en vivo: `NOP` (idle), `RUN` (ejecutando), `INT` (esperando permiso, parpadea), `RET` (tarea OK), `HLT` (error). Incluye un menú **SETTINGS** para elegir qué sonido usa cada evento y ajustar el volumen (ver abajo). |
+| `menubar/claude-usage.15s.sh` | 15s | Cuenta regresiva hasta el reset de la ventana de 5h; costo real de la sesión actual (tokens exactos del transcript local + pricing oficial vigente) disponible en el dropdown |
+| `menubar/claude-account.60s.sh` | 60s | Uso real de cuenta: ventana de 5 horas y 7 días (via el endpoint OAuth de Anthropic), con alertas sonoras en 20/50/75/90/95% |
+
+### Menú SETTINGS (sonidos y volumen)
+
+`claude-status.1s.sh` agrega un submenú **▓ SETTINGS ▓** con:
+
+- **Sonido por evento** (permission / success / error): lista cualquier `.mp3` que pongas en `~/.claude/sounds/` y con un click lo asigna a ese evento — copia el archivo elegido sobre el nombre fijo que los hooks siempre invocan (`permission.mp3`, `success.mp3`, `error.mp3`), así que nunca hace falta tocar `settings.json` de nuevo.
+- **Volumen** (25%–200%): se guarda en `~/.claude/sound-volume.txt` y los hooks lo leen dinámicamente (`afplay -v $(cat ...)`).
+- **Abrir carpeta de sonidos**: atajo para agregar archivos nuevos.
+
+Requiere `scripts/set-sound.sh` y `scripts/set-volume.sh` (incluidos en este repo).
 
 ## Cómo funciona (fuentes de datos)
 

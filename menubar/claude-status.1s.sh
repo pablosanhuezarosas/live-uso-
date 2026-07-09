@@ -32,4 +32,36 @@ echo "HLT = error | font=Menlo color=#1fae0a"
 echo "---"
 echo "Refresh | refresh=true"
 echo "---"
+echo "▓ SETTINGS ▓ | font=Menlo size=11 color=#1fae0a"
+
+SOUNDS_DIR="$HOME/.claude/sounds"
+SET_SOUND="$HOME/.claude/scripts/set-sound.sh"
+SOUND_STATE="$HOME/.claude/sound-settings.json"
+mkdir -p "$SOUNDS_DIR"
+
+for EVT in permission success error; do
+  CURRENT=$(jq -r --arg e "$EVT" '.[$e] // "?"' "$SOUND_STATE" 2>/dev/null)
+  echo "-- Sonido: $EVT (actual: $CURRENT) | font=Menlo size=11"
+  for f in "$SOUNDS_DIR"/*.mp3; do
+    [ -e "$f" ] || continue
+    NAME=$(basename "$f")
+    MARK=""
+    [ "$NAME" = "$CURRENT" ] && MARK=" ✓"
+    echo "---- $NAME$MARK | bash=$SET_SOUND param1=$EVT param2=\"$f\" terminal=false refresh=true"
+  done
+done
+
+SET_VOLUME="$HOME/.claude/scripts/set-volume.sh"
+CURRENT_VOL=$(cat "$HOME/.claude/sound-volume.txt" 2>/dev/null || echo "1.0")
+echo "-- Volumen (actual: ${CURRENT_VOL}) | font=Menlo size=11"
+for LEVEL in "10%:0.1" "20%:0.2" "30%:0.3" "40%:0.4" "50%:0.5" "60%:0.6" "70%:0.7" "80%:0.8" "90%:0.9" "100%:1.0"; do
+  LABEL="${LEVEL%%:*}"
+  VAL="${LEVEL##*:}"
+  MARK=""
+  [ "$VAL" = "$CURRENT_VOL" ] && MARK=" ✓"
+  echo "---- $LABEL$MARK | bash=$SET_VOLUME param1=$VAL terminal=false refresh=true"
+done
+
+echo "-- Abrir carpeta de sonidos | bash=/usr/bin/open param1=\"$SOUNDS_DIR\" terminal=false"
+echo "---"
 echo "by Pablo Sanhueza Rosas | font=Menlo size=10 color=#1fae0a"
