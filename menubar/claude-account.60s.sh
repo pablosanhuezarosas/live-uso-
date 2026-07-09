@@ -81,13 +81,16 @@ check_alerts() {
   [ "$prev_reset" != "$reset_key" ] && alerted="[]"
   new_alerted="$alerted"
 
+  local vol
+  vol=$(cat "$HOME/.claude/sound-volume.txt" 2>/dev/null || echo 1.0)
+
   for threshold in 20 50 75 90 95; do
     already=$(echo "$alerted" | jq --argjson t "$threshold" 'index($t) != null')
     if [ "$pct" -ge "$threshold" ] && [ "$already" != "true" ]; then
       if [ "$threshold" -eq 95 ]; then
-        ( afplay "$ALERT_SOUND"; sleep 0.4; afplay "$ALERT_SOUND" ) &
+        ( afplay -v "$vol" "$ALERT_SOUND"; sleep 0.4; afplay -v "$vol" "$ALERT_SOUND" ) &
       else
-        ( afplay "$ALERT_SOUND" ) &
+        ( afplay -v "$vol" "$ALERT_SOUND" ) &
       fi
       new_alerted=$(echo "$new_alerted" | jq --argjson t "$threshold" '. + [$t]')
     fi
