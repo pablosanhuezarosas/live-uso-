@@ -68,6 +68,7 @@ SEVEN_PCT=${SEVEN_PCT:-0}
 
 ALERT_STATE="$HOME/.claude/account-alert-state.json"
 ALERT_SOUND="$HOME/.claude/sounds/account-alert.mp3"
+MUTE_FILE="$HOME/.claude/account-alert-muted"
 
 check_alerts() {
   local pct=$1
@@ -87,13 +88,18 @@ check_alerts() {
   local vol
   vol=$(cat "$HOME/.claude/account-alert-volume.txt" 2>/dev/null || echo 1.0)
 
+  local muted="false"
+  [ -f "$MUTE_FILE" ] && muted="true"
+
   for threshold in 20 50 75 90 95; do
     already=$(echo "$alerted" | jq --argjson t "$threshold" 'index($t) != null')
     if [ "$pct" -ge "$threshold" ] && [ "$already" != "true" ]; then
-      if [ "$threshold" -eq 95 ]; then
-        ( afplay -v "$vol" "$ALERT_SOUND"; sleep 0.4; afplay -v "$vol" "$ALERT_SOUND" ) &
-      else
-        ( afplay -v "$vol" "$ALERT_SOUND" ) &
+      if [ "$muted" != "true" ]; then
+        if [ "$threshold" -eq 95 ]; then
+          ( afplay -v "$vol" "$ALERT_SOUND"; sleep 0.4; afplay -v "$vol" "$ALERT_SOUND" ) &
+        else
+          ( afplay -v "$vol" "$ALERT_SOUND" ) &
+        fi
       fi
       new_alerted=$(echo "$new_alerted" | jq --argjson t "$threshold" '. + [$t]')
     fi
@@ -126,6 +132,13 @@ echo "────────────────────────�
 echo ":: fuente no oficial :: api.anthropic.com/oauth/usage | font=Menlo size=10 color=#2d6e1e"
 echo "---"
 echo "▓ SETTINGS ▓ | font=Menlo size=11 color=#1fae0a"
+
+TOGGLE_MUTE="$HOME/.claude/scripts/toggle-account-mute.sh"
+if [ -f "$MUTE_FILE" ]; then
+  echo "-- Sonido de alertas: SILENCIADO (click para activar) | font=Menlo size=11 color=#888888 bash=$TOGGLE_MUTE terminal=false refresh=true"
+else
+  echo "-- Sonido de alertas: ACTIVO (click para silenciar) | font=Menlo size=11 color=#39ff14 bash=$TOGGLE_MUTE terminal=false refresh=true"
+fi
 
 SOUNDS_DIR="$HOME/.claude/sounds"
 SET_ACCOUNT_SOUND="$HOME/.claude/scripts/set-account-sound.sh"
