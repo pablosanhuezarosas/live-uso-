@@ -71,7 +71,10 @@ ALERT_SOUND="$HOME/.claude/sounds/account-alert.mp3"
 
 check_alerts() {
   local pct=$1
-  local reset_key=$2
+  # Truncate to whole seconds — the API's resets_at carries sub-second jitter
+  # (different microseconds on every call for the same actual reset time),
+  # which broke the dedup key and made alerts re-fire every 60s.
+  local reset_key="${2%%.*}"
   local prev_reset="" alerted="[]" new_alerted
 
   if [ -f "$ALERT_STATE" ]; then
